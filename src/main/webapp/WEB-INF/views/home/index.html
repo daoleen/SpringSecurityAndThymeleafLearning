@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:mvc="http://java.sun.com/jsf/core"
+      layout:decorator="layouts/layout">
+
+<head>
+    <title>Home page!</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div sec:authorize="isAuthenticated()">
+        You are authorized as `<span sec:authentication="name">USERNAME</span>`<br />
+        Your credentials are: <span sec:authentication="principal.authorities">USER_AUTHORITIES</span><br />
+        <a href="#" th:href="@{/account/logout}" th:text="Logout">link to logout</a>
+    </div>
+    <div sec:authorize="isAnonymous()">
+        You are not logged in...<br />
+        <a href="#" th:href="@{/account/login}" th:text="Login">link to login page</a>
+    </div>
+
+    <h3>Using Thymeleaf</h3>
+    <p th:text="#{home.welcome}">multi-language text</p>
+    <a href="#" th:href="@{/link}" th:text="link">URL</a><br/>
+    <a href="#" th:href="@{/order/details(orderId=${o.id})}">view</a><br/>
+    <a href="#" th:href="@{/order/process(execId=${execId},execType='FAST')}">Link with several params</a><br/>
+    <a>If cookies are not enabled or this is not yet known, Thymeleaf will add a ";jsessionid=..." suffix to relative URLs so
+        that session is preserved. This is called URL Rewriting.</a><br/>
+    <p th:utext="#{home.welcome(${#locale.country})}">Text with parameter</p>
+
+
+
+    <b>Summary:</b><br />
+    <b>Simple expressions:</b><br/>
+    Variable Expressions: ${...}<br/>
+    Selection Variable Expressions: *{...}<br/>
+    Message Expressions: #{...}<br/>
+    Link URL Expressions: @{...}<br/>
+
+    <b>Literals</b><br/>
+    Text literals: 'one text' , 'Another one!' ,... <br/>
+    Number literals: 0 , 34 , 3.0 , 12.3 ,... <br/>
+    Boolean literals: true , false <br/>
+    Null literal: null <br/>
+    Literal tokens: one , sometext , main ,... <br/>
+
+    <b>Text operations:</b><br/>
+    String concatenation: + <br/>
+    Literal substitutions: |The name is ${name}| <br/>
+
+    <b>Arithmetic operations:</b><br/>
+    Binary operators: + , - , * , / , % <br/>
+    Minus sign (unary operator): - <br/>
+
+    <b>Boolean operations:</b><br/>
+    Binary operators: and , or <br/>
+    Boolean negation (unary operator): ! , not <br/>
+
+    <b>Comparisons and equality:</b><br/>
+    Comparators: &gt; , &lt; , &gt;= , &lt;= ( gt , lt , ge , le ) <br/>
+    Equality operators: == , != ( eq , ne ) <br/>
+
+    <b>Conditional operators:</b>
+    If-then: (if) ? (then) <br/>
+    If-then-else: (if) ? (then) : (else) <br/>
+    Default: (value) ?: (defaultvalue) <br/>
+
+    <b>All this features can be combined and nested:</b><br/>
+    <i>'User is of type ' + (${user.isAdmin()} ? 'Administrator' : (${user.type} ?: 'Unknown'))</i><br/>
+
+    <b>Expression Basic Objects</b><br/>
+    When evaluating OGNL expressions on the context variables, some objects are made available to expressions for higher
+    flexibility. These objects will be referenced (per OGNL standard) starting with the # symbol:<br />
+    #ctx : the context object. <br/>
+    #vars: the context variables. <br/>
+    #locale : the context locale. <br/>
+    #httpServletRequest : (only in Web Contexts) the HttpServletRequest object. <br/>
+    #httpSession : (only in Web Contexts) the HttpSession object. <br/>
+    So we can do this: <br/>
+    <i>Established locale country: <span th:text="${#locale.country}">US</span>.</i><br/>
+
+    <b>Expression Utility Objects</b> <br/>
+    Besides these basic objects, Thymeleaf will offer us a set of utility objects that will help us perform common tasks in our
+    expressions. <br/>
+    #dates : utility methods for java.util.Date objects: formatting, component extraction, etc. <br/>
+    #calendars : analogous to #dates , but for java.util.Calendar objects. <br/>
+    #numbers : utility methods for formatting numeric objects. <br/>
+    #strings : utility methods for String objects: contains, startsWith, prepending/appending, etc. <br/>
+    #objects : utility methods for objects in general. <br/>
+    #bools : utility methods for boolean evaluation. <br />
+    #arrays : utility methods for arrays. <br/>
+    #lists : utility methods for lists. <br/>
+    #sets : utility methods for sets. <br/>
+    #maps : utility methods for maps. <br/>
+    #aggregates : utility methods for creating aggregates on arrays or collections. <br/>
+    #messages : utility methods for obtaining externalized messages inside variables expressions, in the same way as they
+    would be obtained using #{...} syntax. <br/>
+    #ids : utility methods for dealing with id attributes that might be repeated (for example, as a result of an iteration).
+    <br/>
+    <p><i>Today is: <span th:text="${#calendars.format(today,'dd MMMM yyyy')}">13 February 2011</span></i></p>
+
+    <b>Expressions on selections (asterisk syntax)</b> <br/>
+    <div th:object="${session.user}">
+        <p>Name: <span th:text="*{firstName}">Sebastian</span>.</p>
+        <p>Surname: <span th:text="*{lastName}">Pepper</span>.</p>
+        <p>Nationality: <span th:text="*{nationality}">Saturn</span>.</p>
+    </div>
+    <br/>
+
+    <div th:if="${variable.something} == null"> ... </div><br/>
+    <p th:text="'The name of the user is ' + ${user.name}">appending text</p>
+    <span th:text="|Welcome to our application, ${user.name}!|">text formatting</span><br />
+    <p th:with="isEven=${prodStat.count % 2 == 0}">arithmetic</p>
+    <p th:if="${prodStat.count} gt; 1"
+       th:text="'Execution mode is ' + ( (${execMode} == 'dev')? 'Development' : 'Production')">comparators and equality</p><br />
+    <a th:if="${not #lists.isEmpty(prod.comments)}">view</a>
+
+    <form action="subscribe.html" th:attr="action=@{/subscribe}">Setting attribute values</form><br />
+    <img src="several_attributes.png" th:attr="src=@{/images/gtvglogo.png},title=#{logo},alt=#{logo}"/><br />
+    <input type="button" value="appending class" class="btn" th:attrappend="class=${' ' + cssStyle}" /><br />
+    <input type="checkbox" name="boolean" th:checked="${user.active}" /><br />
+
+    <div th:object="${order}">
+        <p><b>Code:</b> <span th:text="*{id}">99</span></p>
+        <p><b>Date:</b> <span th:text="*{#calendars.format(date,'dd MMM yyyy')}">13 jan 2011</span></p>
+    </div>
+
+    <!-- Iterable -->
+    <tr th:each="prod : ${prods}" th:class="${prodStat.odd}? 'odd'">
+        <td th:text="${prod.name}">Onions</td>
+        <td th:text="${prod.price}">2.41</td>
+        <td th:text="${prod.inStock}? #{true} : #{false}">yes</td>
+    </tr><br />
+
+    <!-- switch -->
+    <div th:switch="${user.role}">
+        <p th:case="'admin'">User is an administrator</p>
+        <p th:case="#{roles.manager}">User is a manager</p>
+    </div>
+
+    <!-- layout... -->
+    <div th:include="footer :: (${user.isAdmin}? #{footer.admin} : #{footer.normaluser})"></div>
+    <footer th:fragment="copy">
+        &copy; 2011 The Good Thymes Virtual Grocery
+    </footer>
+    <div th:replace="footer :: copy"></div>
+
+    <!-- comments -->
+    <!--/* This code will be removed at thymeleaf parsing time! */-->
+    <!--/*--><div>you can see me only before thymeleaf processes me!</div><!--*/-->
+    <!--/*/<div th:text="${...}">...</div>/*/-->
+
+    <!--/*/ <th:block th:each="user : ${users}"> /*/-->
+    <tr>
+        <td th:text="${user.login}">...</td>
+        <td th:text="${user.name}">...</td>
+    </tr>
+    <tr>
+        <td colspan="2" th:text="${user.address}">...</td>
+    </tr>
+    <!--/*/ </th:block> /*/-->
+
+
+    <!-- Text inlining -->
+    we could prefer writing this:
+    <p><i>Hello, [[${session.user.name}]]!</i></p>
+    ...instead of this:
+    <p><i>Hello, <span th:text="${session.user.name}">Sebastian</span>!</i></p>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        ...
+        var username = /*[[${session.user.name}]]*/ 'Sebastian';
+        ...
+        /*]]>*/
+    </script>
+
+
+    <!-- Doctypes -->
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+    <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+    <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-transitional-thymeleaf-4.dtd">
+    <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-frameset-thymeleaf-4.dtd">
+    <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml11-thymeleaf-4.dtd">
+
+    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" />
+
+
+
+
+    <!-- Expression Basic Objects -->
+    <b>#ctx </b>: the context object. It will be an implementation of org.thymeleaf.context.IContext ,
+    org.thymeleaf.context.IWebContext depending on our environment (standalone or web). If we are using the Spring
+    integration module, it will be an instance of org.thymeleaf.spring3.context.SpringWebContext . <br/>
+    <i>
+        ${#ctx.locale}
+        ${#ctx.variables}
+        ${#ctx.applicationAttributes}
+        ${#ctx.httpServletRequest}
+        ${#ctx.httpServletResponse}
+        ${#ctx.httpSession}
+        ${#ctx.requestAttributes}
+        ${#ctx.requestParameters}
+        ${#ctx.servletContext}
+        ${#ctx.sessionAttributes}
+    </i>
+
+    <b>#locale : direct access to the java.util.Locale associated with current request.</b><br/>
+    <i>${#locale}</i>
+
+    <b>#vars </b>: an instance of org.thymeleaf.context.VariablesMap with all the variables in the Context ((usually the
+    variables contained in #ctx.variables plus local ones).
+    Unqualified expressions are evaluated against this object. In fact, ${something} is completely equivalent to (but more
+    beautiful than) ${#vars.something} .
+    #root is a synomyn for the same object.
+    <i>
+        ${#vars.get('foo')}
+        ${#vars.containsKey('foo')}
+        ${#vars.size()}
+    </i>
+
+    <b>param : for retrieving request parameters. ${param.foo} is a String[] with the values of the foo request parameter,
+        so ${param.foo[0]} will normally be used for getting the first value.</b><br/>
+    <i>
+        ${param.foo} // Retrieves a String[] with the values of request parameter 'foo'
+        ${param.size()}
+        ${param.isEmpty()}
+        ${param.containsKey('foo')}
+    </i>
+
+    <b>session : for retrieving session attributes.</b>
+    <i>
+        ${session.foo}
+        ${session.size()}
+        ${session.isEmpty()}
+        ${session.containsKey('foo')}
+        ...
+    </i>
+
+    <b>application : for retrieving application/servlet context attributes.</b>
+    <i>
+        ${application.foo} // Retrieves the ServletContext atttribute 'foo'
+        ${application.size()}
+        ${application.isEmpty()}
+        ${application.containsKey('foo')}
+
+        Note there is no need to specify a namespace for accessing request attributes (as opposed to request parameters)
+        because all request attributes are automatically added to the context as variables in the context root:
+        ${myRequestAttribute}
+    </i>
+
+    <b>#httpServletRequest : direct access to the javax.servlet.http.HttpServletRequest object associated with the
+        current request.</b>
+    <i>
+        ${#httpServletRequest.getAttribute('foo')}
+        ${#httpServletRequest.getParameter('foo')}
+        ${#httpServletRequest.getContextPath()}
+        ${#httpServletRequest.getRequestName()}
+        ...
+    </i>
+
+    <b>#httpSession : direct access to the javax.servlet.http.HttpSession object associated with the current request.</b>
+    <i>
+        ${#httpSession.getAttribute('foo')}
+        ${#httpSession.id}
+        ${#httpSession.lastAccessedTime}
+        ...
+    </i>
+
+    <b>#themes : provides the same features as the Spring spring:theme JSP tag.</b>
+    <i>
+        ${#themes.code('foo')}
+    </i>
+
+    <b>Spring beans</b>
+    <i>
+        <div th:text="${@authService.getUserName()}">...</div>
+    </i>
+
+
+
+
+
+    <!-- Expression Utility Objects -->
+    <b>#dates : utility methods for java.util.Date objects:</b>
+    <i>
+        /*
+        * Null-safe toString()
+        */
+        ${#strings.toString(obj)}
+        // also array*, list* and set*
+        /*
+        * Format date with the standard locale format
+        * Also works with arrays, lists or sets
+        */
+        ${#dates.format(date)}
+        ${#dates.arrayFormat(datesArray)}
+        ${#dates.listFormat(datesList)}
+        ${#dates.setFormat(datesSet)}
+        /*
+        * Format date with the specified pattern
+        * Also works with arrays, lists or sets
+        */
+        ${#dates.format(date, 'dd/MMM/yyyy HH:mm')}
+        ${#dates.arrayFormat(datesArray, 'dd/MMM/yyyy HH:mm')}
+        ${#dates.listFormat(datesList, 'dd/MMM/yyyy HH:mm')}
+        ${#dates.setFormat(datesSet, 'dd/MMM/yyyy HH:mm')}
+        /*
+        * Obtain date properties
+        * Also works with arrays, lists or sets
+        */
+        ${#dates.day(date)}
+        ${#dates.month(date)}
+        ${#dates.monthName(date)}
+        ${#dates.monthNameShort(date)}
+        ${#dates.year(date)}
+        ${#dates.dayOfWeek(date)}
+        ${#dates.dayOfWeekName(date)}
+        ${#dates.dayOfWeekNameShort(date)}
+        ${#dates.hour(date)}
+        ${#dates.minute(date)}
+        ${#dates.second(date)}
+        ${#dates.millisecond(date)}
+        /*
+        * Create date (java.util.Date) objects from its components
+        */
+        ${#dates.create(year,month,day)}
+        ${#dates.create(year,month,day,hour,minute)}
+        ${#dates.create(year,month,day,hour,minute,second)}
+        ${#dates.create(year,month,day,hour,minute,second,millisecond)}
+        /*
+        * Create a date (java.util.Date) object for the current date and time
+        */
+        ${#dates.createNow()}
+        /*
+        * Create a date (java.util.Date) object for the current date (time set to 00:00)
+        */
+        ${#dates.createToday()}
+    </i>
+
+
+    <b>#calendars : analogous to #dates , but for java.util.Calendar objects:</b>
+    <i>
+        ${#calendars.format(cal)}
+        ${#calendars.arrayFormat(calArray)}
+        ${#calendars.listFormat(calList)}
+        ${#calendars.setFormat(calSet)}
+        /*
+        * Format calendar with the specified pattern
+        * Also works with arrays, lists or sets
+        */
+        ${#calendars.format(cal, 'dd/MMM/yyyy HH:mm')}
+        ${#calendars.arrayFormat(calArray, 'dd/MMM/yyyy HH:mm')}
+        ${#calendars.listFormat(calList, 'dd/MMM/yyyy HH:mm')}
+        ${#calendars.setFormat(calSet, 'dd/MMM/yyyy HH:mm')}
+        /*
+        * Obtain calendar properties
+        * Also works with arrays, lists or sets
+        */
+        ${#calendars.day(date)}
+        ${#calendars.month(date)}        //
+        ${#calendars.monthName(date)}        //
+        ${#calendars.monthNameShort(date)}        //
+        ${#calendars.year(date)}        //
+        ${#calendars.dayOfWeek(date)}        //
+        ${#calendars.dayOfWeekName(date)}        //
+        ${#calendars.dayOfWeekNameShort(date)} //
+        ${#calendars.hour(date)}        //
+        ${#calendars.minute(date)}        //
+        ${#calendars.second(date)}        //
+        ${#calendars.millisecond(date)}
+
+        /*
+        * Create calendar (java.util.Calendar) objects from its components
+        */
+        ${#calendars.create(year,month,day)}
+        ${#calendars.create(year,month,day,hour,minute)}
+        ${#calendars.create(year,month,day,hour,minute,second)}
+        ${#calendars.create(year,month,day,hour,minute,second,millisecond)}
+        /*
+        * Create a calendar (java.util.Calendar) object for the current date and time
+        */
+        ${#calendars.createNow()}
+        /*
+        * Create a calendar (java.util.Calendar) object for the current date (time set to 00:00)
+        */
+        ${#calendars.createToday()}
+    </i>
+
+
+    <b>#numbers : utility methods for number objects:</b>
+    <i>
+        ${#numbers.formatInteger(num,3)}
+        ${#numbers.arrayFormatInteger(numArray,3)}
+        ${#numbers.listFormatInteger(numList,3)}
+        ${#numbers.setFormatInteger(numSet,3)}
+        /*
+        * Set minimum integer digits and thousands separator:
+        * 'POINT', 'COMMA', 'NONE' or 'DEFAULT' (by locale).
+        * Also works with arrays, lists or sets
+        */
+        ${#numbers.formatInteger(num,3,'POINT')}
+        ${#numbers.arrayFormatInteger(numArray,3,'POINT')}
+        ${#numbers.listFormatInteger(numList,3,'POINT')}
+        ${#numbers.setFormatInteger(numSet,3,'POINT')}
+        /*
+        * ==========================
+        * Formatting decimal numbers
+        * ==========================
+        */
+        /*
+        * Set minimum integer digits and (exact) decimal digits.
+        * Also works with arrays, lists or sets
+        */
+        ${#numbers.formatDecimal(num,3,2)}
+        ${#numbers.arrayFormatDecimal(numArray,3,2)}
+        ${#numbers.listFormatDecimal(numList,3,2)}
+        ${#numbers.setFormatDecimal(numSet,3,2)}
+        /*
+        * Set minimum integer digits and (exact) decimal digits, and also decimal separator.
+        * Also works with arrays, lists or sets
+        */
+        ${#numbers.formatDecimal(num,3,2,'COMMA')}
+        ${#numbers.arrayFormatDecimal(numArray,3,2,'COMMA')}
+        ${#numbers.listFormatDecimal(numList,3,2,'COMMA')}
+        ${#numbers.setFormatDecimal(numSet,3,2,'COMMA')}
+        /*
+        * Set minimum integer digits and (exact) decimal digits, and also thousands and
+        * decimal separator.
+        * Also works with arrays, lists or sets
+        */
+        ${#numbers.formatDecimal(num,3,'POINT',2,'COMMA')}
+        ${#numbers.arrayFormatDecimal(numArray,3,'POINT',2,'COMMA')}
+        ${#numbers.listFormatDecimal(numList,3,'POINT',2,'COMMA')}
+        ${#numbers.setFormatDecimal(numSet,3,'POINT',2,'COMMA')}
+        /*
+        * ==========================
+        * Utility methods
+        * ==========================
+        */
+        /*
+        * Create a sequence (array) of integer numbers going
+        * from x to y
+        */
+        ${#numbers.sequence(from,to)}
+        ${#numbers.sequence(from,to,step)}
+    </i>
+
+    <b>#strings : utility methods for String objects:</b>
+    <i>
+        ${#strings.isEmpty(name)}
+        ${#strings.arrayIsEmpty(nameArr)}
+        ${#strings.listIsEmpty(nameList)}
+        ${#strings.setIsEmpty(nameSet)}
+        /*
+        * Check whether a fragment is contained in a String
+        * Also works with arrays, lists or sets
+        */
+        ${#strings.contains(name,'ez')}
+        // also array*, list* and set*
+        ${#strings.containsIgnoreCase(name,'ez')}
+        // also array*, list* and set*
+        /*
+        * Check whether a String starts or ends with a fragment
+        * Also works with arrays, lists or sets
+        */
+        ${#strings.startsWith(name,'Don')}
+        // also array*, list* and set*
+        ${#strings.endsWith(name,endingFragment)}
+        // also array*, list* and set*
+        /*
+        * Substring-related operations
+        * Also works with arrays, lists or sets
+        */
+        ${#strings.indexOf(name,frag)}
+        ${#strings.substring(name,3,5)}
+        ${#strings.substringAfter(name,prefix)}
+        ${#strings.substringBefore(name,suffix)}
+        ${#strings.replace(name,'las','ler')} //
+        /*
+        * Append and prepend
+        * Also works with arrays, lists or sets
+        */
+        ${#strings.prepend(str,prefix)}
+        ${#strings.append(str,suffix)} // also array*, list* and set*
+        // also array*, list* and set*
+        /*
+        * Change case
+        * Also works with arrays, lists or sets
+        */
+        ${#strings.toUpperCase(name)}
+        ${#strings.toLowerCase(name)} // also array*, list* and set*
+        // also array*, list* and set*
+        /*
+        * Split and join
+        */
+        ${#strings.arrayJoin(namesArray,',')}
+        ${#strings.listJoin(namesList,',')}
+        ${#strings.setJoin(namesSet,',')}
+        ${#strings.arraySplit(namesStr,',')}
+        ${#strings.listSplit(namesStr,',')}
+        ${#strings.setSplit(namesStr,',')} // returns String[]
+        // returns List<String>
+        // returns Set<String>
+        /*
+        * Trim
+        * Also works with arrays, lists or sets
+        */
+        ${#strings.trim(str)} // also array*, list* and set*
+        /*
+        * Compute length
+        * Also works with arrays, lists or sets
+        */
+        ${#strings.length(str)} // also array*, list* and set*
+        /*
+        * Abbreviate text making it have a maximum size of n. If text is bigger, it will be clipped and
+        * finished in "..."
+        * Also works with arrays, lists or sets
+        */
+        ${#strings.abbreviate(str,10)}
+        // also array*, list* and set*
+        /*
+        * Convert the first character to upper-case (and vice-versa)
+        */
+        ${#strings.capitalize(str)}
+        // also array*, list* and set*
+        ${#strings.unCapitalize(str)}
+        // also array*, list* and set*
+        /*
+        * Convert the first character of every word to upper-case
+        */
+        ${#strings.capitalizeWords(str)}
+        // also array*, list* and set*
+        ${#strings.capitalizeWords(str,delimiters)}
+        // also array*, list* and set*
+        /*
+        * Escape the string
+        */
+        ${#strings.escapeXml(str)}
+        ${#strings.escapeJava(str)}
+        ${#strings.escapeJavaScript(str)}
+        ${#strings.unescapeJava(str)}
+        ${#strings.unescapeJavaScript(str)}
+        /*
+        * Null-safe comparison and concatenation
+        */
+        ${#strings.equals(str)}
+        ${#strings.equalsIgnoreCase(str)}
+        ${#strings.concat(str)}
+        ${#strings.concatReplaceNulls(str)}
+        /*
+        * Random
+        */
+        ${#strings.randomAlphanumeric(count)}
+    </i>
+
+
+
+    <b>#objects : utility methods for objects in general</b>
+    <i>
+        ${#objects.nullSafe(obj, default )}
+        ${#objects.arrayNullSafe(objArray, default )}
+        ${#objects.listNullSafe(objList, default )}
+        ${#objects.setNullSafe(objSet, default )}
+    </i>
+
+
+    <b>#bools : utility methods for boolean evaluation</b>
+    <i>
+        ${#bools.isTrue(obj)}
+        ${#bools.arrayIsTrue(objArray)}
+        ${#bools.listIsTrue(objList)}
+        ${#bools.setIsTrue(objSet)}
+        /*
+        * Evaluate with negation
+        * Also works with arrays, lists or sets
+        */
+        ${#bools.isFalse(cond)}
+        ${#bools.arrayIsFalse(condArray)}
+        ${#bools.listIsFalse(condList)}
+        ${#bools.setIsFalse(condSet)}
+        /*
+        * Evaluate and apply AND operator
+        * Receive an array, a list or a set as parameter
+        */
+        ${#bools.arrayAnd(condArray)}
+        ${#bools.listAnd(condList)}
+        ${#bools.setAnd(condSet)}
+        /*
+        * Evaluate and apply OR operator
+        * Receive an array, a list or a set as parameter
+        */
+        ${#bools.arrayOr(condArray)}
+        ${#bools.listOr(condList)}
+        ${#bools.setOr(condSet)}
+    </i>
+
+
+    <b>#arrays : utility methods for arrays</b>
+    <i>
+        ${#arrays.toArray(object)}
+        /*
+        * Convert to arrays of the specified component class.
+        */
+        ${#arrays.toStringArray(object)}
+        ${#arrays.toIntegerArray(object)}
+        ${#arrays.toLongArray(object)}
+        ${#arrays.toDoubleArray(object)}
+        ${#arrays.toFloatArray(object)}
+        ${#arrays.toBooleanArray(object)}
+        /*
+        * Compute length
+        */
+        ${#arrays.length(array)}
+        /*
+        * Check whether array is empty
+        */
+        ${#arrays.isEmpty(array)}
+        /*
+        * Check if element or elements are contained in array
+        */
+        ${#arrays.contains(array, element)}
+        ${#arrays.containsAll(array, elements)}
+    </i>
+
+
+    <b>#lists : utility methods for lists</b>
+    <i>
+        ${#lists.toList(object)}
+        /*
+        * Compute size
+        */
+        ${#lists.size(list)}
+        /*
+        * Check whether list is empty
+        */
+        ${#lists.isEmpty(list)}
+        ${#lists.contains(list, element)}
+        ${#lists.containsAll(list, elements)}
+        /*
+        * Sort a copy of the given list. The members of the list must implement
+        * comparable or you must define a comparator.
+        */
+        ${#lists.sort(list)}
+        ${#lists.sort(list, comparator)}
+    </i>
+
+
+    <b>#sets : utility methods for sets</b>
+    <i>
+        ${#sets.toSet(object)}
+        /*
+        * Compute size
+        */
+        ${#sets.size(set)}
+        /*
+        * Check whether set is empty
+        */
+        ${#sets.isEmpty(set)}
+        /*
+        * Check if element or elements are contained in set
+        */
+        ${#sets.contains(set, element)}
+        ${#sets.containsAll(set, elements)}
+    </i>
+
+
+    <b>#maps : utility methods for maps</b>
+    <i>
+        ${#maps.size(map)}
+        /*
+        * Check whether map is empty
+        */
+        ${#maps.isEmpty(map)}
+        /*
+        * Check if key/s or value/s are contained in maps
+        */
+        ${#maps.containsKey(map, key)}
+        ${#maps.containsAllKeys(map, keys)}
+        ${#maps.containsValue(map, value)}
+        ${#maps.containsAllValues(map, value)}
+    </i>
+
+
+
+    <b>#aggregates : utility methods for creating aggregates on arrays or collections</b>
+    <i>
+        ${#aggregates.sum(array)}
+        ${#aggregates.sum(collection)}
+        /*
+        * Compute average. Returns null if array or collection is empty
+        */
+        ${#aggregates.avg(array)}
+        ${#aggregates.avg(collection)}
+    </i>
+
+
+    <b>#messages : utility methods for obtaining externalized messages inside variables expressions, in the same way as they
+        would be obtained using #{...} syntax.</b>
+    <i>
+        ${#messages.msg('msgKey')}
+        ${#messages.msg('msgKey', param1)}
+        ${#messages.msg('msgKey', param1, param2)}
+        ${#messages.msg('msgKey', param1, param2, param3)}
+        ${#messages.msgWithParams('msgKey', new Object[] {param1, param2, param3, param4})}
+        ${#messages.arrayMsg(messageKeyArray)}
+        ${#messages.listMsg(messageKeyList)}
+        ${#messages.setMsg(messageKeySet)}
+        /*
+        * Obtain externalized messages or null. Null is returned instead of a default
+        * message if a message for the specified key is not found.
+        */
+        ${#messages.msgOrNull('msgKey')}
+        ${#messages.msgOrNull('msgKey', param1)}
+        ${#messages.msgOrNull('msgKey', param1, param2)}
+        ${#messages.msgOrNull('msgKey', param1, param2, param3)}
+        ${#messages.msgOrNullWithParams('msgKey', new Object[] {param1, param2, param3, param4})}
+        ${#messages.arrayMsgOrNull(messageKeyArray)}
+        ${#messages.listMsgOrNull(messageKeyList)}
+        ${#messages.setMsgOrNull(messageKeySet)}
+    </i>
+
+
+    <b>#ids : utility methods for dealing with id attributes that might be repeated (for example, as a result of an iteration).</b>
+    <i>
+        ${#ids.seq('someId')}
+        /*
+        * Normally used in th:for attributes in <label> tags, so that these labels can refer to Ids
+        * generated by means if the #ids.seq(...) function.
+        *
+        * Depending on whether the <label> goes before or after the element with the #ids.seq(...) function,
+            * the "next" (label goes before "seq") or the "prev" function (label goes after "seq") function
+            should be
+            * called.
+            */
+            ${#ids.next('someId')}
+            ${#ids.prev('someId')}
+    </i>
+
+
+
+
+
+
+
+    <!-- Spring Thymeleaf -->
+    <b>Date formatter for specific locale:</b>
+    <i><td th:text="${{sb.datePlanted}}">13/01/2011</td></i>
+    <u>in Messages_es.properties:</u>
+    <i>
+        title.list=Lista de semilleros
+        date.format=dd/MM/yyyy
+        bool.true=sí
+        bool.false=no
+    </i>
+    <td th:text="${sb.covered}? #{bool.true} : #{bool.false}">yes</td>
+
+
+    <b>Working with Forms</b>
+    <form action="#" th:action="@{/seedstartermng}" th:object="${seedStarter}" method="post">
+        <input type="text" th:field="*{datePlanted}" />
+
+        <label th:for="${#ids.next('covered')}" th:text="#{seedstarter.covered}">Covered</label>
+        <input type="checkbox" th:field="*{covered}" />
+
+        <ul>
+            <li th:each="feat : ${allFeatures}">
+                <input type="checkbox" th:field="*{features}" th:value="${feat}" />
+                <label th:for="${#ids.prev('features')}" th:text="#{${'seedstarter.feature.' + feat}}">Heating</label>
+            </li>
+        </ul>
+
+        <ul>
+            <li th:each="ty : ${allTypes}">
+                <input type="radio" th:field="*{type}" th:value="${ty}" />
+                <label th:for="${#ids.prev('type')}" th:text="#{${'seedstarter.type.' + ty}}">Wireframe</label>
+            </li>
+        </ul>
+
+        <select th:field="*{type}">
+            <option th:each="type : ${allTypes}"
+                    th:value="${type}"
+                    th:text="#{${'seedstarter.type.' + type}}">Wireframe</option>
+        </select>
+    </form>
+
+
+    <b>Validation and Error Messages</b>
+    <i>
+        All errors for field:
+        <ul>
+            <li th:each="err : ${#fields.errors('datePlanted')}" th:text="${err}" />
+        </ul>
+
+        Error for field:
+        <input type="text" th:field="*{datePlanted}" th:class="${#fields.hasErrors('datePlanted')} ? fieldError" />
+
+        Instead of iterating, we could have also used th:errors , a specialized attribute which builds a list with all
+        the errors for the specified selector, separated by <br /> :
+        <input type="text" th:field="*{datePlanted}" />
+        <p th:if="${#fields.hasErrors('datePlanted')}" th:errors="*{datePlanted}">Incorrect date</p>
+
+        error-based CSS styling: th:errorclass:
+        <input type="text" th:field="*{datePlanted}" class="small" th:errorclass="fieldError" />
+
+        All errors:
+        <ul th:if="${#fields.hasErrors('*')}">
+            <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Input is incorrect</li>
+        </ul>
+        ...as well as build a <br /> -separated list:
+        <p th:if="${#fields.hasErrors('all')}" th:errors="*{all}">Incorrect date</p>
+        Finally. Note #fields.hasErrors('*') is equivalent to #fields.hasAnyErrors() and #fields.errors('*') is
+        equivalent to #fields.allErrors() . Use whichever syntax you prefer:
+        <div th:if="${#fields.hasAnyErrors()}">
+            <p th:each="err : ${#fields.allErrors()}" th:text="${err}">...</p>
+        </div>
+
+
+        Global errors
+        There is a third type of error in a Spring form: global errors. These are errors that are not associated with any specific fields
+        in the form, but still exist.
+        Thymeleaf offers the global constant for accessing these errors:
+        <ul th:if="${#fields.hasErrors('global')}">
+            <li th:each="err : ${#fields.errors('global')}" th:text="${err}">Input is incorrect</li>
+        </ul>
+        <p th:if="${#fields.hasErrors('global')}" th:errors="*{global}">Incorrect date</p>
+        ...as well as equivalent #fields.hasGlobalErrors() and #fields.globalErrors() convenience methods:
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">...</p>
+        </div>
+
+        Displaying errors outside forms
+        Form validation errors can also be displayed outside forms by using variable ( ${...} ) instead of selection ( *{...} )
+        expressions and prefixing the name of the form-backing bean:
+        <div th:errors="${myForm}">...</div>
+        <div th:errors="${myForm.date}">...</div>
+        <div th:errors="${myForm.*}">...</div>
+        <div th:if="${#fields.hasErrors('${myForm}')}">...</div>
+        <div th:if="${#fields.hasErrors('${myForm.date}')}">...</div>
+        <div th:if="${#fields.hasErrors('${myForm.*}')}">...</div>
+        <form th:object="${myForm}">
+            ...
+        </form>
+
+        Rich error objects
+        Thymeleaf offers the possibility to obtain form error information in the form of beans (instead of mere strings), with the
+        fieldName (String), message (String) and global (boolean) attributes.
+        These errors can be obtained by means of the #fields.detailedErrors() utility method:
+        <ul>
+            <li th:each="e : ${#fields.detailedErrors()}" th:class="${e.global}? globalerr : fielderr">
+                <span th:text="${e.global}? '*' : ${e.fieldName}">The field name</span> |
+                <span th:text="${e.message}">The error message</span>
+            </li>
+        </ul>
+    </i>
+
+
+    <!-- The Conversion Service -->
+10.1 Configuration
+As explained before, Thymeleaf can make use of a Conversion Service registered at the Application Context. Let's see again
+what it looks like:
+<?xml version="1.0" encoding="UTF-8"?>
+<beans ...>
+...
+<mvc:annotation-driven conversion-service="conversionService" />
+...
+<!-- **************************************************************** -->
+    <!-- CONVERSION SERVICE
+    -->
+    <!-- Standard Spring formatting-enabled implementation
+    -->
+    <!-- **************************************************************** -->
+    <bean id="conversionService"
+          class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="formatters">
+            <set>
+                <bean class="thymeleafexamples.stsm.web.conversion.VarietyFormatter" />
+                <bean class="thymeleafexamples.stsm.web.conversion.DateFormatter" />
+            </set>
+        </property>
+    </bean>
+    ...
+    </beans>
+    10.1 Double-bracket syntax
+    The Conversion Service can be easily applied in order to convert/format any object into String. This is done by means of the
+    double-bracket syntax:
+    For variable expressions: ${{...}}
+    For selection expressions: *{{...}}
+    So, for example, given an Integer-to-String converter that adds commas as a thousands separator, this:
+    <p th:text="${val}">...</p>
+    <p th:text="${{val}}">...</p>
+    ...should result in:
+    <p>1234567890</p>
+    <p>1,234,567,890</p>
+
+    Use in forms
+    We saw before that every th:field attribute will always apply the conversion service, so this:
+    <input type="text" th:field="*{datePlanted}" />
+    ...is actually equivalent to:
+    <input type="text" th:field="*{{datePlanted}}" />
+    Note that this is the only scenario in which the Conversion Service is applied in expressions using single-bracket syntax.
+
+    #conversions utility object
+    The #conversions expression utility object allows the manual execution of the Conversion Service wherever needed:
+    <p th:text="${'Val: ' + #conversions.convert(val,'String')}">...</p>
+    Syntax for this utility object:
+    #conversions.convert(Object,Class) : converts the object to the specified class.
+    #conversions.convert(Object,String) : same as above, but specifying the target class as a String (note the
+    java.lang. package can be ommitted).
+</div>
+</body>
+</html>

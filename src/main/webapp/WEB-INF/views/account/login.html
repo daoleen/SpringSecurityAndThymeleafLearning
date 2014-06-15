@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorator="layouts/layout">
+
+<head>
+    <title>Home page!</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <form id="loginForm" action="#" th:action="@{/account/login/process}" method="post">
+        <table>
+            <tr th:if="${fail}" class="auth_error">
+                <td colspan="2">
+                    Failed to login.
+                    <span th:if="${session['SPRING_SECURITY_LAST_EXCEPTION']}">
+                        Exception: <span th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}">ExceptionMessage here...</span>
+                    </span>
+                </td>
+            </tr>
+            <tr class="formInput">
+                <td th:text="#{form.auth.label.login}">Login</td>
+                <td><input type="text" name="username" size="10" class="form-control" /></td>
+            </tr>
+            <tr class="formInput">
+                <td th:text="#{form.auth.label.password}">Password</td>
+                <td><input type="password" name="password" size="10" class="form-control" /></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input id="remember_me" name="remember_me" type="checkbox" />
+                    <label for="rememer_me" th:text="#{form.auth.label.remember}">Remember me</label>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="submit" value="Authorize" th:value="#{label.authorize}" class="btn-success" /></td>
+            </tr>
+        </table>
+    </form>
+</div>
+</body>
+</html>
